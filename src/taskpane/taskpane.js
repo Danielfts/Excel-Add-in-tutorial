@@ -13,8 +13,18 @@ Office.onReady((info) => {
     document.getElementById("app-body").style.display = "flex";
     document.getElementById("sort-table").onclick = () => tryCatch(sortTable);
     document.getElementById("create-chart").onclick = () => tryCatch(createChart);
+    document.getElementById("freeze-header").onclick = () => tryCatch(freezeHeader);
   }
 });
+
+async function freezeHeader() {
+  await Excel.run(async (context) => {
+    //FREEZE TABLE HEADER
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    currentWorksheet.freezePanes.freezeRows(1);
+    await context.sync();
+  });
+}
 
 async function createChart() {
   await Excel.run(async (context) => {
