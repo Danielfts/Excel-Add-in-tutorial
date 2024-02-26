@@ -8,15 +8,42 @@
 Office.onReady((info) => {
   if (info.host === Office.HostType.Excel) {
     document.getElementById("create-table").onclick = () => tryCatch(createTable);
+    document.getElementById("filter-table").onclick = () => tryCatch(filterTable);
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
+    document.getElementById("sort-table").onclick = () => tryCatch(sortTable);
   }
 });
 
+async function sortTable() {
+  await Excel.run(async (context) => {
+    //TODO Sort table by Merchant name.
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    const expensesTable = currentWorksheet.tables.getItem("ExpensesTable");
+    const sortFields = [
+      {
+        key: 1,
+        ascending: false,
+      },
+    ];
+    expensesTable.sort.apply(sortFields);
+    await context.sync();
+  });
+}
+
+async function filterTable() {
+  await Excel.run(async (context) => {
+    // TODO ADD FILERING FUNCTIONALITY
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    const expensesTable = currentWorksheet.tables.getItem("ExpensesTable");
+    const categoryFilter = expensesTable.columns.getItem("Category").filter;
+    categoryFilter.applyValuesFilter(["Education", "Groceries"]);
+    await context.sync();
+  });
+}
+
 async function createTable() {
   await Excel.run(async (context) => {
-    // TODO : ADD FUNCIONALITY
-
     // CREATES TABLE
     const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
     const expensesTable = currentWorksheet.tables.add("A1:D1", true);
