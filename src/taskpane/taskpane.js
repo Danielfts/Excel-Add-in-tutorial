@@ -12,8 +12,29 @@ Office.onReady((info) => {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     document.getElementById("sort-table").onclick = () => tryCatch(sortTable);
+    document.getElementById("create-chart").onclick = () => tryCatch(createChart);
   }
 });
+
+async function createChart() {
+  await Excel.run(async (context) => {
+    // GET RANGE OF DATA TO BE CHARTED
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    const expensesTable = currentWorksheet.tables.getItem("ExpensesTable");
+    const dataRange = expensesTable.getDataBodyRange();
+    // CREATE THE CHART AND DEFINE ITS TYPE
+    const chart = currentWorksheet.charts.add("ColumnClustered", dataRange, "Auto");
+    // POSITION AND FORMAT THE CHART
+    chart.setPosition("A15", "F30");
+    chart.title.text = "Expenses";
+    chart.legend.position = "Right";
+    chart.legend.format.fill.setSolidColor("white");
+    chart.dataLabels.format.font.size = 15;
+    chart.dataLabels.format.font.color = "black";
+    chart.series.getItemAt(0).name = "Value in \u20AC";
+    await context.sync();
+  });
+}
 
 async function sortTable() {
   await Excel.run(async (context) => {
